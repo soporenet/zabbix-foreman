@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Project: zabbix-foreman
-# File: ForemanReportGen-json.sh
+# File: SoporeNet_ForemanReportGen-json.sh
 # Description: File for collecting stats
 # Author: SoporeNet
 # Email: admin@sopore.net
@@ -25,9 +25,9 @@ LIFECYCLE_PROMOTE_DAYS=2
 REPOSITORY_SYNC_DAYS=1
 
 # Logging Setup
-LOG_DIR="/jobs/cronlogs/satellite_health"
+LOG_DIR="/var/log/soporenet_foreman_health"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-LOG_FILE="${LOG_DIR}/satellite_health_${TIMESTAMP}.log"
+LOG_FILE="${LOG_DIR}/foreman_health_${TIMESTAMP}.log"
 mkdir -p "$LOG_DIR"
 touch "$LOG_FILE"
 
