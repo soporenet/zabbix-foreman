@@ -23,6 +23,7 @@ A comprehensive Zabbix template for monitoring Foreman/Katello infrastructure, i
 - Ansible user with sudo privileges on Capsules
 
 ## Installation
+
 1. **Import the template**:
    - Navigate to Zabbix web interface → Templates → Import
    - Upload `Foreman_Monitoring_Template.json`
@@ -40,6 +41,7 @@ A comprehensive Zabbix template for monitoring Foreman/Katello infrastructure, i
 4. **Assign template to your Foreman host in Zabbix**
 
 ## Configuration
+
 Edit the script variables in ForemanReportGen-json.sh to match your environment:
    ```bash
    # Configuration Variables
@@ -59,6 +61,7 @@ Edit the script variables in ForemanReportGen-json.sh to match your environment:
    ```
 
 ## Collected Metrics
+
 1. **Satellite Services**
 - Service status (running/stopped)
 - Detailed status information
@@ -84,6 +87,7 @@ Edit the script variables in ForemanReportGen-json.sh to match your environment:
 - Currently running syncs
 
 ## Zabbix Items Overview
+
 **Main Items**
 - foreman.health.data: Raw JSON health data
 - foreman.health.generation_time_epoch: Data freshness check
@@ -113,8 +117,9 @@ Edit the script variables in ForemanReportGen-json.sh to match your environment:
 -- Lifecycle Environments: Promotion status
 
 ## Troubleshooting
+
 - No data appearing:
--- Verify cron job is running (/usr/local/bin/foreman_health_check.sh)
+-- Verify cron job is running (/usr/local/bin/ForemanReportGen-json)
 -- Check log files in /jobs/cronlogs/satellite_health/
 -- Verify database credentials in the script
 -- SSH connection issues to capsules:
