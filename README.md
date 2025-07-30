@@ -30,13 +30,12 @@ A comprehensive Zabbix template for monitoring Foreman/Katello infrastructure, i
 
 2. **Deploy the data collection script**:
    ```bash
-   cp ForemanReportGen-json.sh /usr/local/bin/SoporeNet_ForemanReportGen-json.sh
+   cp SoporeNet_ForemanReportGen-json.sh /usr/local/bin/SoporeNet_ForemanReportGen-json.sh
    chmod +x /usr/local/bin/SoporeNet_ForemanReportGen-json.sh
-   mkdir -p /jobs/cronlogs/foreman_health
    ``` 
 3. **Configure cron job (run every 10 minutes)**:
    ```bash
-   echo "*/10 * * * * root /usr/local/bin/SoporeNet_ForemanReportGen-json" > /etc/cron.d/SoporeNet_ForemanReportGen-json
+   echo "*/10 * * * * root /usr/local/bin/SoporeNet_ForemanReportGen-json.sh" > /etc/cron.d/SoporeNet_ForemanReportGen-json
     ```
 4. **Assign template to your Foreman host in Zabbix**
 
@@ -119,10 +118,10 @@ Edit the script variables in SoporeNet_ForemanReportGen-json.sh to match your en
 ## Troubleshooting
 
 - No data appearing:
--- Verify cron job is running (/usr/local/bin/SoporeNet_ForemanReportGen-json)
--- Check log files in /jobs/cronlogs/foreman_health/
+-- Verify cron job is running (/usr/local/bin/SoporeNet_ForemanReportGen-json.sh)
+-- Check log files in /var/log/soporenet_foreman_health/
 -- Verify database credentials in the script
--- SSH connection issues to capsules:
+-- SSH connection issues to capsules
 -- Ensure key-based SSH is configured for the Ansible user
 -- Verify sudo privileges for the Ansible user on capsules
 
