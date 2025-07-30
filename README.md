@@ -26,23 +26,23 @@ A comprehensive Zabbix template for monitoring Foreman/Katello infrastructure, i
 
 1. **Import the template**:
    - Navigate to Zabbix web interface → Templates → Import
-   - Upload `Foreman_Monitoring_Template.json`
+   - Upload `SoporeNet_Foreman_Monitoring_Template.json`
 
 2. **Deploy the data collection script**:
    ```bash
-   cp ForemanReportGen-json.sh /usr/local/bin/ForemanReportGen-json.sh
-   chmod +x /usr/local/bin/ForemanReportGen-json.sh
-   mkdir -p /jobs/cronlogs/satellite_health
+   cp ForemanReportGen-json.sh /usr/local/bin/SoporeNet_ForemanReportGen-json.sh
+   chmod +x /usr/local/bin/SoporeNet_ForemanReportGen-json.sh
+   mkdir -p /jobs/cronlogs/foreman_health
    ``` 
 3. **Configure cron job (run every 10 minutes)**:
    ```bash
-   echo "*/10 * * * * root /usr/local/bin/ForemanReportGen-json" > /etc/cron.d/ForemanReportGen-json
+   echo "*/10 * * * * root /usr/local/bin/SoporeNet_ForemanReportGen-json" > /etc/cron.d/SoporeNet_ForemanReportGen-json
     ```
 4. **Assign template to your Foreman host in Zabbix**
 
 ## Configuration
 
-Edit the script variables in ForemanReportGen-json.sh to match your environment:
+Edit the script variables in SoporeNet_ForemanReportGen-json.sh to match your environment:
    ```bash
    # Configuration Variables
    LIFECYCLE_ENVS=("Team1" "Team2")              # Your lifecycle environments
@@ -119,8 +119,8 @@ Edit the script variables in ForemanReportGen-json.sh to match your environment:
 ## Troubleshooting
 
 - No data appearing:
--- Verify cron job is running (/usr/local/bin/ForemanReportGen-json)
--- Check log files in /jobs/cronlogs/satellite_health/
+-- Verify cron job is running (/usr/local/bin/SoporeNet_ForemanReportGen-json)
+-- Check log files in /jobs/cronlogs/foreman_health/
 -- Verify database credentials in the script
 -- SSH connection issues to capsules:
 -- Ensure key-based SSH is configured for the Ansible user
