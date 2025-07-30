@@ -29,13 +29,13 @@ A comprehensive Zabbix template for monitoring Foreman/Katello infrastructure, i
 
 2. **Deploy the data collection script**:
    ```bash
-   cp ForemanReportGen-json.sh /usr/local/bin/foreman_health_check.sh
-   chmod +x /usr/local/bin/foreman_health_check.sh
+   cp ForemanReportGen-json.sh /usr/local/bin/ForemanReportGen-json.sh
+   chmod +x /usr/local/bin/ForemanReportGen-json.sh
    mkdir -p /jobs/cronlogs/satellite_health
    ``` 
 3. **Configure cron job (run every 10 minutes)**:
    ```bash
-   echo "*/10 * * * * root /usr/local/bin/foreman_health_check.sh" > /etc/cron.d/foreman_health_check
+   echo "*/10 * * * * root /usr/local/bin/ForemanReportGen-json" > /etc/cron.d/ForemanReportGen-json
     ```
 4. **Assign template to your Foreman host in Zabbix**
 
