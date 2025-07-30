@@ -1,0 +1,1221 @@
+{
+    "zabbix_export": {
+        "version": "7.2",
+        "template_groups": [
+            {
+                "uuid": "4ba4783dc4f744ca8deca58cd4f22696",
+                "name": "Templates/Custom"
+            }
+        ],
+        "templates": [
+            {
+                "uuid": "3fdd67f37f454cc4908ec1f6f2e2cd00",
+                "template": "SoporeNet Foreman Monitoring Template",
+                "name": "SoporeNet Foreman Monitoring Template",
+                "groups": [
+                    {
+                        "name": "Templates/Custom"
+                    }
+                ],
+                "items": [
+                    {
+                        "uuid": "57a42e0e4cb84622aa80f0f0c83aa710",
+                        "name": "Foreman Health Data",
+                        "key": "foreman.health.data",
+                        "delay": "5s",
+                        "value_type": "TEXT",
+                        "tags": [
+                            {
+                                "tag": "product",
+                                "value": "foreman"
+                            },
+                            {
+                                "tag": "source",
+                                "value": "json"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "8b0345b072d74438b594e0dd818fdb15",
+                                "expression": "nodata(/SoporeNet Foreman Monitoring Template/foreman.health.data,600)=1",
+                                "recovery_mode": "NONE",
+                                "name": "No data",
+                                "priority": "HIGH",
+                                "manual_close": "YES",
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "289901fa61b94d989accc6a0e0702a55",
+                        "name": "Health Data Generation Time In epoch",
+                        "type": "DEPENDENT",
+                        "key": "foreman.health.generation_time_epoch",
+                        "trends": "0",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.metadata.generation_time"
+                                ]
+                            },
+                            {
+                                "type": "JAVASCRIPT",
+                                "parameters": [
+                                    "// value: \"2025-06-14 13:41:59.635687\"\nconst parts = value.split('.')[0].split(/[- :]/);\n// parts = [ \"2025\", \"06\", \"14\", \"13\", \"41\", \"59\" ]\nconst dt = new Date(\n    Number(parts[0]),         // year\n    Number(parts[1]) - 1,     // month (0-based)\n    Number(parts[2]),         // day\n    Number(parts[3]),         // hour\n    Number(parts[4]),         // minute\n    Number(parts[5])          // second\n);\nreturn Math.floor(dt.getTime() / 1000);\n"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "foreman.health.data"
+                        },
+                        "tags": [
+                            {
+                                "tag": "product",
+                                "value": "foreman"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "b2dec35febbd4cba87ff54187f591aa7",
+                                "expression": "(now() - last(/SoporeNet Foreman Monitoring Template/foreman.health.generation_time_epoch)) >  600",
+                                "recovery_mode": "RECOVERY_EXPRESSION",
+                                "recovery_expression": "(now() - last(/SoporeNet Foreman Monitoring Template/foreman.health.generation_time_epoch)) <  600",
+                                "name": "Stale Data",
+                                "priority": "HIGH",
+                                "manual_close": "YES",
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "36e62221d4a043698b082e4189e25f74",
+                        "name": "Content Views - Healthy%",
+                        "type": "DEPENDENT",
+                        "key": "satellite.health.cv.healthypercentage",
+                        "description": "Healthy percentage",
+                        "preprocessing": [
+                            {
+                                "type": "JAVASCRIPT",
+                                "parameters": [
+                                    "var data = JSON.parse(value);\nvar count= 0;\nvar total = data.content_views.length;\n\nfor (var i = 0; i < total; i++) {\n    if (data.content_views[i].STATUS_CODE === \"0\") count++;\n}\n\nvar percentage = (count/ total) * 100;\nreturn Math.round(percentage * 100) / 100; // rounded to 2 decimal places\n"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "foreman.health.data"
+                        },
+                        "tags": [
+                            {
+                                "tag": "product",
+                                "value": "foreman"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "bb5058d67a37436e970350780600e871",
+                        "name": "Lifecycle Environments - Healthy%",
+                        "type": "DEPENDENT",
+                        "key": "satellite.health.le.healthypercentage",
+                        "description": "Healthy percentage",
+                        "preprocessing": [
+                            {
+                                "type": "JAVASCRIPT",
+                                "parameters": [
+                                    "var data = JSON.parse(value);\nvar count= 0;\nvar total = data.lifecycle_environments.length;\n\nfor (var i = 0; i < total; i++) {\n    if (data.lifecycle_environments[i].STATUS_CODE === \"0\") count++;\n}\n\nvar percentage = (count/ total) * 100;\nreturn Math.round(percentage * 100) / 100; // rounded to 2 decimal places\n"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "foreman.health.data"
+                        },
+                        "tags": [
+                            {
+                                "tag": "product",
+                                "value": "foreman"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "1b5f2166f7c64e83b48179e7d789a855",
+                        "name": "Repositories - Healthy%",
+                        "type": "DEPENDENT",
+                        "key": "satellite.health.repo.healthypercentage",
+                        "description": "Healthy percentage",
+                        "preprocessing": [
+                            {
+                                "type": "JAVASCRIPT",
+                                "parameters": [
+                                    "var data = JSON.parse(value);\nvar count= 0;\nvar total = data.repositories.length;\n\nfor (var i = 0; i < total; i++) {\n    if (data.repositories[i].STATUS_CODE === \"0\") count++;\n}\n\nvar percentage = (count/ total) * 100;\nreturn Math.round(percentage * 100) / 100; // rounded to 2 decimal places\n"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "foreman.health.data"
+                        },
+                        "tags": [
+                            {
+                                "tag": "product",
+                                "value": "foreman"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "8a32694a250e47368db9d2470e85bffd",
+                        "name": "Services - Healthy%",
+                        "type": "DEPENDENT",
+                        "key": "satellite.health.svc.healthypercentage",
+                        "description": "Healthy percentage",
+                        "preprocessing": [
+                            {
+                                "type": "JAVASCRIPT",
+                                "parameters": [
+                                    "var data = JSON.parse(value);\nvar count= 0;\nvar total = data.services.length;\n\nfor (var i = 0; i < total; i++) {\n    if (data.services[i].STATUS_CODE === \"0\") count++;\n}\n\nvar percentage = (count/ total) * 100;\nreturn Math.round(percentage * 100) / 100; // rounded to 2 decimal places\n"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "foreman.health.data"
+                        },
+                        "tags": [
+                            {
+                                "tag": "product",
+                                "value": "foreman"
+                            }
+                        ]
+                    }
+                ],
+                "discovery_rules": [
+                    {
+                        "uuid": "c1fdeabdf8d64f35a103c1d853c20bc1",
+                        "name": "Content-View Discovery",
+                        "type": "DEPENDENT",
+                        "key": "foreman.health.cv.discovery",
+                        "item_prototypes": [
+                            {
+                                "uuid": "1ae02965703e421091e90470cf23a8aa",
+                                "name": "{#NAME} Publish Date",
+                                "type": "DEPENDENT",
+                                "key": "foreman.health.cv.publish_date[{#NAME}]",
+                                "value_type": "TEXT",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "var data = JSON.parse(value);\n\nfor (var i = 0; i < data.content_views.length; i++) {\n    if (data.content_views[i].COMPONENT === '{#NAME}') {\n        return data.content_views[i].PUBLISH_DATE;\n    }\n}\n\nthrow 'No match found';\n"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "foreman.health.data"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "59baf84106604a0784d9f243024a9762",
+                                "name": "{#NAME} Status - Flipped Binary",
+                                "type": "DEPENDENT",
+                                "key": "foreman.health.cv.statuscodeflipbin[{#NAME}]",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "return value == 0 ? 1 : 0;"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "foreman.health.cv.statuscode[{#NAME}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "d42db58c873548a7ab9bda27585cf876",
+                                "name": "{#NAME} Status",
+                                "type": "DEPENDENT",
+                                "key": "foreman.health.cv.statuscode[{#NAME}]",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "var data = JSON.parse(value);\n\nfor (var i = 0; i < data.content_views.length; i++) {\n    if (data.content_views[i].COMPONENT === '{#NAME}') {\n        return data.content_views[i].STATUS_CODE;\n    }\n}\n\nthrow 'No match found';"
+                                        ]
+                                    },
+                                    {
+                                        "type": "MULTIPLIER",
+                                        "parameters": [
+                                            "1"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "foreman.health.data"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "707199e4223547ffbaa949548b849547",
+                                "name": "{#NAME} Status Info",
+                                "type": "DEPENDENT",
+                                "key": "foreman.health.cv.statusinfo[{#NAME}]",
+                                "value_type": "TEXT",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "var data = JSON.parse(value);\nfor (var i = 0; i < data.content_views.length; i++) {\n    if (data.content_views[i].COMPONENT === '{#NAME}') {\n        return data.content_views[i].STATUS_INFO;\n    }\n}\nthrow 'No match found';"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "foreman.health.data"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            }
+                        ],
+                        "trigger_prototypes": [
+                            {
+                                "uuid": "744b1d4937454b75a4fae2e6eb54f9cd",
+                                "expression": "last(/SoporeNet Foreman Monitoring Template/foreman.health.cv.statuscode[{#NAME}])<>0 and last(/SoporeNet Foreman Monitoring Template/foreman.health.cv.statusinfo[{#NAME}])<>0",
+                                "recovery_mode": "RECOVERY_EXPRESSION",
+                                "recovery_expression": "last(/SoporeNet Foreman Monitoring Template/foreman.health.cv.statuscode[{#NAME}])=0 and last(/SoporeNet Foreman Monitoring Template/foreman.health.cv.statusinfo[{#NAME}])<>0",
+                                "name": "Problem with {#NAME}",
+                                "priority": "HIGH",
+                                "manual_close": "YES",
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "foreman.health.data"
+                        },
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.content_views[*]"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "07f39c6ba3c44519ae9884413dba5074",
+                        "name": "Lifecycle-Environment Discovery",
+                        "type": "DEPENDENT",
+                        "key": "foreman.health.le.discovery",
+                        "item_prototypes": [
+                            {
+                                "uuid": "88816c0f6df74ba7b6a97558c526f1aa",
+                                "name": "{#NAME} Status - Flipped Binary",
+                                "type": "DEPENDENT",
+                                "key": "foreman.health.le.statuscodeflipbin[{#NAME}]",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "return value == 0 ? 1 : 0;"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "foreman.health.le.statuscode[{#NAME}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "5674c83f138c4eae9b6c39e0335a3498",
+                                "name": "{#NAME} Status",
+                                "type": "DEPENDENT",
+                                "key": "foreman.health.le.statuscode[{#NAME}]",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "var data = JSON.parse(value);\n\nfor (var i = 0; i < data.lifecycle_environments.length; i++) {\n    if (data.lifecycle_environments[i].COMPONENT === '{#NAME}') {\n        return data.lifecycle_environments[i].STATUS_CODE;\n    }\n}\n\nthrow 'No match found';\n"
+                                        ]
+                                    },
+                                    {
+                                        "type": "MULTIPLIER",
+                                        "parameters": [
+                                            "1"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "foreman.health.data"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "e2a3838ba6874de987177fddc0096724",
+                                "name": "{#NAME} Status Info",
+                                "type": "DEPENDENT",
+                                "key": "foreman.health.le.statusinfo[{#NAME}]",
+                                "value_type": "TEXT",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "var data = JSON.parse(value);\nfor (var i = 0; i < data.lifecycle_environments.length; i++) {\n    if (data.lifecycle_environments[i].COMPONENT === '{#NAME}') {\n        return data.lifecycle_environments[i].STATUS_INFO;\n    }\n}\nthrow 'No match found';"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "foreman.health.data"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            }
+                        ],
+                        "trigger_prototypes": [
+                            {
+                                "uuid": "0e0c0ac6a7ac4ff79f2b9f55a6621f10",
+                                "expression": "last(/SoporeNet Foreman Monitoring Template/foreman.health.le.statuscode[{#NAME}])<>0 and last(/SoporeNet Foreman Monitoring Template/foreman.health.le.statusinfo[{#NAME}])<>0",
+                                "recovery_mode": "RECOVERY_EXPRESSION",
+                                "recovery_expression": "last(/SoporeNet Foreman Monitoring Template/foreman.health.le.statuscode[{#NAME}])=0 and last(/SoporeNet Foreman Monitoring Template/foreman.health.le.statusinfo[{#NAME}])<>0",
+                                "name": "Problem with {#NAME}",
+                                "priority": "HIGH",
+                                "manual_close": "YES",
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "foreman.health.data"
+                        },
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.lifecycle_environments[*]"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "b10692645ab546fbb94fa3df82125526",
+                        "name": "Repository Discovery",
+                        "type": "DEPENDENT",
+                        "key": "foreman.health.repo.discovery",
+                        "item_prototypes": [
+                            {
+                                "uuid": "221fb9b59715491ea9d85765a75c77ed",
+                                "name": "{#NAME} Last Sync",
+                                "type": "DEPENDENT",
+                                "key": "foreman.health.repo.last_sync[{#NAME}]",
+                                "value_type": "TEXT",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "var data = JSON.parse(value);\n\nfor (var i = 0; i < data.repositories.length; i++) {\n    if (data.repositories[i].COMPONENT === '{#NAME}') {\n        return data.repositories[i].LAST_SYNC;\n    }\n}\n\nthrow 'No match found';\n"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "foreman.health.data"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "066a1dca4e3c4ab1b14f486899fcd7c5",
+                                "name": "{#NAME}  Status - Flipped Binary",
+                                "type": "DEPENDENT",
+                                "key": "foreman.health.repo.statuscodeflipbin[{#NAME}]",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "return value == 0 ? 1 : 0;"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "foreman.health.repo.statuscode[{#NAME}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "92906717266c4442bf02d590ceed3edc",
+                                "name": "{#NAME}  Status",
+                                "type": "DEPENDENT",
+                                "key": "foreman.health.repo.statuscode[{#NAME}]",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "var data = JSON.parse(value);\n\nfor (var i = 0; i < data.repositories.length; i++) {\n    if (data.repositories[i].COMPONENT === '{#NAME}') {\n        return data.repositories[i].STATUS_CODE;\n    }\n}\n\nthrow 'No match found';"
+                                        ]
+                                    },
+                                    {
+                                        "type": "MULTIPLIER",
+                                        "parameters": [
+                                            "1"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "foreman.health.data"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "956a1e1b1cd84377a4053a4ba2eed075",
+                                "name": "{#NAME} Status Info",
+                                "type": "DEPENDENT",
+                                "key": "foreman.health.repo.statusinfo[{#NAME}]",
+                                "value_type": "TEXT",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "var data = JSON.parse(value);\nfor (var i = 0; i < data.repositories.length; i++) {\n    if (data.repositories[i].COMPONENT === '{#NAME}') {\n        return data.repositories[i].STATUS_INFO;\n    }\n}\nthrow 'No match found';\n"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "foreman.health.data"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            }
+                        ],
+                        "trigger_prototypes": [
+                            {
+                                "uuid": "3ba1a6d83b984e59aea8f41d377e5a8b",
+                                "expression": "last(/SoporeNet Foreman Monitoring Template/foreman.health.repo.statuscode[{#NAME}])<>0 and last(/SoporeNet Foreman Monitoring Template/foreman.health.repo.statusinfo[{#NAME}])<>0",
+                                "recovery_mode": "RECOVERY_EXPRESSION",
+                                "recovery_expression": "last(/SoporeNet Foreman Monitoring Template/foreman.health.repo.statuscode[{#NAME}])=0 and last(/SoporeNet Foreman Monitoring Template/foreman.health.repo.statusinfo[{#NAME}])<>0",
+                                "name": "Problem with {#NAME}",
+                                "priority": "HIGH",
+                                "manual_close": "YES",
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "foreman.health.data"
+                        },
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.repositories[*]"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "a0851f7de5c9458fb2dc9ddc8ac20c68",
+                        "name": "Service Discovery",
+                        "type": "DEPENDENT",
+                        "key": "foreman.health.svc.discovery",
+                        "item_prototypes": [
+                            {
+                                "uuid": "bf8f4979e3b049f4a6c5297895b2dcb8",
+                                "name": "{#NAME} Status - Flipped Binary",
+                                "type": "DEPENDENT",
+                                "key": "foreman.health.svc.statuscodeflipbin[{#NAME}]",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "return value == 0 ? 1 : 0;"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "foreman.health.svc.statuscode[{#NAME}]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "2017e9a0368c4440b8b14645e8440ee5",
+                                "name": "{#NAME} Status",
+                                "type": "DEPENDENT",
+                                "key": "foreman.health.svc.statuscode[{#NAME}]",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "var data = JSON.parse(value);\n\nfor (var i = 0; i < data.services.length; i++) {\n    if (data.services[i].COMPONENT === '{#NAME}') {\n        return data.services[i].STATUS_CODE;\n    }\n}\n\nthrow 'No match found';\n"
+                                        ]
+                                    },
+                                    {
+                                        "type": "MULTIPLIER",
+                                        "parameters": [
+                                            "1"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "foreman.health.data"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "aaef991cd21945a08c52cfe1e93a1f92",
+                                "name": "{#NAME} Status Info",
+                                "type": "DEPENDENT",
+                                "key": "foreman.health.svc.statusinfo[{#NAME}]",
+                                "value_type": "TEXT",
+                                "preprocessing": [
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "var data = JSON.parse(value);\nfor (var i = 0; i < data.services.length; i++) {\n    if (data.services[i].COMPONENT === '{#NAME}') {\n        return data.services[i].STATUS_INFO;\n    }\n}\nthrow 'No match found';\n"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "foreman.health.data"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            }
+                        ],
+                        "trigger_prototypes": [
+                            {
+                                "uuid": "f21112e47d354fe99d5e32ab14b61554",
+                                "expression": "last(/SoporeNet Foreman Monitoring Template/foreman.health.svc.statuscode[{#NAME}])<>0 and last(/SoporeNet Foreman Monitoring Template/foreman.health.svc.statusinfo[{#NAME}])<>0",
+                                "recovery_mode": "RECOVERY_EXPRESSION",
+                                "recovery_expression": "last(/SoporeNet Foreman Monitoring Template/foreman.health.svc.statuscode[{#NAME}])=0 and last(/SoporeNet Foreman Monitoring Template/foreman.health.svc.statusinfo[{#NAME}])<>0",
+                                "name": "Problem with {#NAME}",
+                                "priority": "HIGH",
+                                "manual_close": "YES",
+                                "tags": [
+                                    {
+                                        "tag": "product",
+                                        "value": "foreman"
+                                    }
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "foreman.health.data"
+                        },
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.services"
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "tags": [
+                    {
+                        "tag": "product",
+                        "value": "foreman"
+                    },
+                    {
+                        "tag": "scope",
+                        "value": "availability"
+                    }
+                ],
+                "dashboards": [
+                    {
+                        "uuid": "be65f6843fd04df292f5305a0936be94",
+                        "name": "Foreman Health",
+                        "pages": [
+                            {
+                                "name": "Overview",
+                                "widgets": [
+                                    {
+                                        "type": "problems",
+                                        "name": "Active Foreman Issues",
+                                        "width": "72",
+                                        "height": "5",
+                                        "fields": [
+                                            {
+                                                "type": "STRING",
+                                                "name": "reference",
+                                                "value": "EFZTN"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "rf_rate",
+                                                "value": "30"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "show_symptoms",
+                                                "value": "1"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "svggraph",
+                                        "name": "Services - Healthy %",
+                                        "y": "5",
+                                        "width": "72",
+                                        "height": "3",
+                                        "fields": [
+                                            {
+                                                "type": "STRING",
+                                                "name": "ds.0.color.0",
+                                                "value": "AB47BC"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.dataset_type",
+                                                "value": "0"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.fill",
+                                                "value": "2"
+                                            },
+                                            {
+                                                "type": "ITEM",
+                                                "name": "ds.0.itemids.0",
+                                                "value": {
+                                                    "host": "SoporeNet Foreman Monitoring Template",
+                                                    "key": "satellite.health.svc.healthypercentage"
+                                                }
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.transparency",
+                                                "value": "3"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.width",
+                                                "value": "2"
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "lefty_max",
+                                                "value": "100"
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "lefty_min",
+                                                "value": "0"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "legend_statistic",
+                                                "value": "1"
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "reference",
+                                                "value": "IZIRN"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "rf_rate",
+                                                "value": "30"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "righty",
+                                                "value": "0"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "svggraph",
+                                        "name": "Repositories - Healthy %",
+                                        "y": "8",
+                                        "width": "72",
+                                        "height": "3",
+                                        "fields": [
+                                            {
+                                                "type": "STRING",
+                                                "name": "ds.0.color.0",
+                                                "value": "42A5F5"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.dataset_type",
+                                                "value": "0"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.fill",
+                                                "value": "2"
+                                            },
+                                            {
+                                                "type": "ITEM",
+                                                "name": "ds.0.itemids.0",
+                                                "value": {
+                                                    "host": "SoporeNet Foreman Monitoring Template",
+                                                    "key": "satellite.health.repo.healthypercentage"
+                                                }
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.transparency",
+                                                "value": "3"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.width",
+                                                "value": "2"
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "lefty_max",
+                                                "value": "100"
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "lefty_min",
+                                                "value": "0"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "legend_statistic",
+                                                "value": "1"
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "reference",
+                                                "value": "NVZLC"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "rf_rate",
+                                                "value": "30"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "righty",
+                                                "value": "0"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "svggraph",
+                                        "name": "Content Views - Healthy %",
+                                        "y": "11",
+                                        "width": "72",
+                                        "height": "3",
+                                        "fields": [
+                                            {
+                                                "type": "STRING",
+                                                "name": "ds.0.color.0",
+                                                "value": "26A69A"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.dataset_type",
+                                                "value": "0"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.fill",
+                                                "value": "2"
+                                            },
+                                            {
+                                                "type": "ITEM",
+                                                "name": "ds.0.itemids.0",
+                                                "value": {
+                                                    "host": "SoporeNet Foreman Monitoring Template",
+                                                    "key": "satellite.health.cv.healthypercentage"
+                                                }
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.transparency",
+                                                "value": "3"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.width",
+                                                "value": "2"
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "lefty_max",
+                                                "value": "100"
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "lefty_min",
+                                                "value": "0"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "legend_statistic",
+                                                "value": "1"
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "reference",
+                                                "value": "AOJTA"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "rf_rate",
+                                                "value": "30"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "righty",
+                                                "value": "0"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "svggraph",
+                                        "name": "Lifecycle Environments - Healthy %",
+                                        "y": "14",
+                                        "width": "72",
+                                        "height": "3",
+                                        "fields": [
+                                            {
+                                                "type": "STRING",
+                                                "name": "ds.0.color.0",
+                                                "value": "FFCA28"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.dataset_type",
+                                                "value": "0"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.fill",
+                                                "value": "2"
+                                            },
+                                            {
+                                                "type": "ITEM",
+                                                "name": "ds.0.itemids.0",
+                                                "value": {
+                                                    "host": "SoporeNet Foreman Monitoring Template",
+                                                    "key": "satellite.health.le.healthypercentage"
+                                                }
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.transparency",
+                                                "value": "3"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "ds.0.width",
+                                                "value": "2"
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "lefty_max",
+                                                "value": "100"
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "lefty_min",
+                                                "value": "0"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "legend_statistic",
+                                                "value": "1"
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "reference",
+                                                "value": "SJVRX"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "rf_rate",
+                                                "value": "30"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "righty",
+                                                "value": "0"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Services",
+                                "display_period": "10",
+                                "widgets": [
+                                    {
+                                        "type": "graphprototype",
+                                        "y": "1",
+                                        "width": "72",
+                                        "height": "12",
+                                        "fields": [
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "columns",
+                                                "value": "1"
+                                            },
+                                            {
+                                                "type": "ITEM_PROTOTYPE",
+                                                "name": "itemid.0",
+                                                "value": {
+                                                    "host": "SoporeNet Foreman Monitoring Template",
+                                                    "key": "foreman.health.svc.statuscodeflipbin[{#NAME}]"
+                                                }
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "reference",
+                                                "value": "KASYP"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "rf_rate",
+                                                "value": "30"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "rows",
+                                                "value": "4"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "source_type",
+                                                "value": "3"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Repositories",
+                                "display_period": "30",
+                                "widgets": [
+                                    {
+                                        "type": "graphprototype",
+                                        "y": "1",
+                                        "width": "71",
+                                        "height": "60",
+                                        "fields": [
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "columns",
+                                                "value": "1"
+                                            },
+                                            {
+                                                "type": "ITEM_PROTOTYPE",
+                                                "name": "itemid.0",
+                                                "value": {
+                                                    "host": "SoporeNet Foreman Monitoring Template",
+                                                    "key": "foreman.health.repo.statuscodeflipbin[{#NAME}]"
+                                                }
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "reference",
+                                                "value": "NJQFT"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "rf_rate",
+                                                "value": "30"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "rows",
+                                                "value": "20"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "source_type",
+                                                "value": "3"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Contenr Views",
+                                "display_period": "30",
+                                "widgets": [
+                                    {
+                                        "type": "graphprototype",
+                                        "y": "1",
+                                        "width": "72",
+                                        "height": "12",
+                                        "fields": [
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "columns",
+                                                "value": "1"
+                                            },
+                                            {
+                                                "type": "ITEM_PROTOTYPE",
+                                                "name": "itemid.0",
+                                                "value": {
+                                                    "host": "SoporeNet Foreman Monitoring Template",
+                                                    "key": "foreman.health.cv.statuscodeflipbin[{#NAME}]"
+                                                }
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "reference",
+                                                "value": "RYXCB"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "rf_rate",
+                                                "value": "30"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "rows",
+                                                "value": "4"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "source_type",
+                                                "value": "3"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "Lifecycle Environments",
+                                "display_period": "30",
+                                "widgets": [
+                                    {
+                                        "type": "graphprototype",
+                                        "y": "1",
+                                        "width": "72",
+                                        "height": "60",
+                                        "fields": [
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "columns",
+                                                "value": "1"
+                                            },
+                                            {
+                                                "type": "ITEM_PROTOTYPE",
+                                                "name": "itemid.0",
+                                                "value": {
+                                                    "host": "SoporeNet Foreman Monitoring Template",
+                                                    "key": "foreman.health.le.statuscodeflipbin[{#NAME}]"
+                                                }
+                                            },
+                                            {
+                                                "type": "STRING",
+                                                "name": "reference",
+                                                "value": "OIGEN"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "rf_rate",
+                                                "value": "30"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "rows",
+                                                "value": "20"
+                                            },
+                                            {
+                                                "type": "INTEGER",
+                                                "name": "source_type",
+                                                "value": "3"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
